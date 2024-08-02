@@ -1,1 +1,1 @@
-# BlockChainProject
+# Apartment Rental Project
