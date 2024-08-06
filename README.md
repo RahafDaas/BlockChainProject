@@ -1,4 +1,8 @@
-# Apartment Rental Project
+Apartment Rental Project
+
+![Screenshot (534)](https://github.com/user-attachments/assets/932cd7ab-bb45-4de6-94ae-419562d10f63)
+
+
 This project aims to create a system that displays the available apartments to be rented.
 We started by assuming that the structure of an apartment consists of:
   * ID             string
