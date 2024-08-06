@@ -19,5 +19,6 @@ The functions of this system are:
 * Updating the Rental Price of an apartment.
 * Updating the Color of an apartment Apartment Rental Project.
 * Register an apartment.
-* And to rent an apartment.
+* To Rent an apartment. 
+* And to unrent an apartment.
   
