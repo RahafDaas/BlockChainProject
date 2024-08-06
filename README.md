@@ -1,7 +1,6 @@
 #Apartment Rental Project
 
-![Screenshot (534)](https://github.com/user-attachments/assets/932cd7ab-bb45-4de6-94ae-419562d10f63)
-
+![Screenshot (534)](https://github.com/user-attachments/assets/97a62446-7e2d-4b75-a4cc-bc67d61e9469)
 
 This project aims to create a system that displays the available apartments to be rented.
 We started by assuming that the structure of an apartment consists of:
