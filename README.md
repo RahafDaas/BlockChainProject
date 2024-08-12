@@ -1,6 +1,6 @@
 # Apartment Rental Project
 
-### The House Whispereres
+## The House Whispereres
 
 ![Screenshot (534)](https://github.com/user-attachments/assets/97a62446-7e2d-4b75-a4cc-bc67d61e9469)
 
@@ -40,7 +40,7 @@ The functions of this system are:
 - To Rent an apartment.
 - And to unrent an apartment.
 
-##### This project was done by Rahaf Daas, Arwa Bawazir, and Raghad Alhuzaimi that is submitted to Security Engineering Lab at Prince Sultan University.
+### This project was done by Rahaf Daas, Arwa Bawazir, and Raghad Alhuzaimi that is submitted to Security Engineering Lab at Prince Sultan University.
 
 Contributor's Github and Linked In accounts:
 
