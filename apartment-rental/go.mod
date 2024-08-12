@@ -13,6 +13,7 @@ require (
 	github.com/gobuffalo/packd v1.0.2 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230731094759-d626e9ab09b9 // indirect
 	github.com/hyperledger/fabric-protos-go v0.3.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

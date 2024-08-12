@@ -2,184 +2,199 @@ package handler
 
 import (
 	"apartment-rental/internal/model/apartment"
-	"apartment-rental/internal/repository/memory"
+	"apartment-rental/internal/repository/contract"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 type ApartmentHandler struct {
-	RepoContract memory.RepoMemory
-	//contract.RepoContract
+	//RepoContract memory.RepoMemory
+	contract.RepoContract
 }
 
-// To get specific apartment
-func (h *ApartmentHandler) GetApartment(ctx contractapi.TransactionContextInterface, ID string) (*apartment.Apartment, error) {
-	return h.RepoContract.GetApartment(ctx, ID)
+// GetApartment retrieves a specific apartment by ID
+func (h *ApartmentHandler) GetApartment(ctx contractapi.TransactionContextInterface, apartmentID string) (*apartment.Apartment, error) {
+	return h.RepoContract.GetApartment(ctx, apartmentID)
 }
 
-// To get all apartments
+// GetAllApartments retrieves all apartments
 func (h *ApartmentHandler) GetAllApartments(ctx contractapi.TransactionContextInterface) ([]*apartment.Apartment, error) {
 	return h.RepoContract.GetAllApartments(ctx)
 }
 
-// To register new apartment
-func (h *ApartmentHandler) Register(ctx contractapi.TransactionContextInterface, ID string, Name string, NumberOfRooms int, Size int, rentalPrice float64, Kitchen bool, LivingRoom bool, RestroomNumber int, FloorNumber int, BuildYear int, Location string, WiFi bool) error {
-	// Check if the aparment is Registered
-	_, err := h.GetApartment(ctx, ID)
-	if err == nil {
-		return fmt.Errorf("apartment with ID %s is registered", ID)
-	}
-	apartment := apartment.New(ID, Name, NumberOfRooms, Size, Kitchen, LivingRoom, RestroomNumber, FloorNumber, BuildYear, Location, WiFi, rentalPrice)
-	return h.RepoContract.PutApartment(ctx, apartment)
-}
+// RegisterApartment registers a new apartment
+func (h *ApartmentHandler) RegisterApartment(ctx contractapi.TransactionContextInterface, title string, roomsCount, squareFootage, restroomsCount, floorLevel, constructionYear int, address string, hasWiFi, hasKitchen, hasLivingRoom bool, monthlyRent float64) error {
+	// Generate a new UUID for apartmentID
+	apartmentID := uuid.New().String()
 
-// To update the name of an apartment
-func (h *ApartmentHandler) UpdateName(ctx contractapi.TransactionContextInterface, ID, newName string) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+	// Create a new apartment instance
+	apt, err := apartment.New(apartmentID, title, address, roomsCount, squareFootage, restroomsCount, floorLevel, constructionYear, hasKitchen, hasLivingRoom, hasWiFi, monthlyRent)
 	if err != nil {
 		return err
 	}
-	apartment.Name = newName
-	return h.RepoContract.PutApartment(ctx, apartment)
+	fmt.Print(apartmentID)
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the street name of an apartment
-func (h *ApartmentHandler) UpdateNumberOfRooms(ctx contractapi.TransactionContextInterface, ID string, newNumberOfRooms int) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentTitle updates the title of an apartment
+func (h *ApartmentHandler) UpdateApartmentTitle(ctx contractapi.TransactionContextInterface, apartmentID, newTitle string) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.NumberOfRooms = newNumberOfRooms
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.Title = newTitle
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the name of an apartment
-func (h *ApartmentHandler) ChangeKitchen(ctx contractapi.TransactionContextInterface, ID string, newKitchen bool) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentRooms updates the number of rooms in an apartment
+func (h *ApartmentHandler) UpdateApartmentRooms(ctx contractapi.TransactionContextInterface, apartmentID string, newRoomsCount int) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.Kitchen = newKitchen
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.RoomsCount = newRoomsCount
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the district name of an apartment
-func (h *ApartmentHandler) UpdateLivingRoom(ctx contractapi.TransactionContextInterface, ID string, newLivingRoom bool) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentKitchen updates the kitchen status of an apartment
+func (h *ApartmentHandler) UpdateApartmentKitchen(ctx contractapi.TransactionContextInterface, apartmentID string, hasKitchen bool) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.LivingRoom = newLivingRoom
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.HasKitchen = hasKitchen
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the size of an apartment
-func (h *ApartmentHandler) UpdateSize(ctx contractapi.TransactionContextInterface, ID string, newSize int) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentLivingRoom updates the living room status of an apartment
+func (h *ApartmentHandler) UpdateApartmentLivingRoom(ctx contractapi.TransactionContextInterface, apartmentID string, hasLivingRoom bool) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.Size = newSize
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.HasLivingRoom = hasLivingRoom
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the price of an apartment
-func (h *ApartmentHandler) Price(ctx contractapi.TransactionContextInterface, ID string, Price float64) error {
-	if Price < 0 {
-		return fmt.Errorf("%.2f must be positive", Price)
-	}
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentSize updates the square footage of an apartment
+func (h *ApartmentHandler) UpdateApartmentSize(ctx contractapi.TransactionContextInterface, apartmentID string, newSquareFootage int) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.RentalPrice = Price
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.SquareFootage = newSquareFootage
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the ID of an apartment
-func (h *ApartmentHandler) UpdateID(ctx contractapi.TransactionContextInterface, ID string, newID string) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentRent updates the rental price of an apartment
+func (h *ApartmentHandler) UpdateApartmentRent(ctx contractapi.TransactionContextInterface, apartmentID string, newRent float64) error {
+	if newRent < 0 {
+		return fmt.Errorf("rental price must be positive")
+	}
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.ID = newID
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.MonthlyRent = newRent
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the Restroom Number of an apartment
-func (h *ApartmentHandler) UpdateRestroomNumber(ctx contractapi.TransactionContextInterface, ID string, newRestroomNumber int) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentID updates the ID of an apartment
+func (h *ApartmentHandler) UpdateApartmentID(ctx contractapi.TransactionContextInterface, apartmentID, newID string) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.RestroomNumber = newRestroomNumber
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.ApartmentID = newID
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the Floor Number of an apartment
-func (h *ApartmentHandler) UpdateFloorNumber(ctx contractapi.TransactionContextInterface, ID string, newFloorNumber int) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentRestrooms updates the number of restrooms in an apartment
+func (h *ApartmentHandler) UpdateApartmentRestrooms(ctx contractapi.TransactionContextInterface, apartmentID string, newRestroomsCount int) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.FloorNumber = newFloorNumber
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.RestroomsCount = newRestroomsCount
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the BuildYear of an apartment
-func (h *ApartmentHandler) UpdateBuildYear(ctx contractapi.TransactionContextInterface, ID string, newBuildYear int) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentFloor updates the floor level of an apartment
+func (h *ApartmentHandler) UpdateApartmentFloor(ctx contractapi.TransactionContextInterface, apartmentID string, newFloorLevel int) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.BuildYear = newBuildYear
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.FloorLevel = newFloorLevel
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// To update the location of an apartment
-func (h *ApartmentHandler) Updatelocation(ctx contractapi.TransactionContextInterface, ID, newlocation string) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentConstructionYear updates the construction year of an apartment
+func (h *ApartmentHandler) UpdateApartmentConstructionYear(ctx contractapi.TransactionContextInterface, apartmentID string, newConstructionYear int) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.Location = newlocation
-	return h.RepoContract.PutApartment(ctx, apartment)
+	apt.ConstructionYear = newConstructionYear
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// Rent
-func (h *ApartmentHandler) RentApartment(ctx contractapi.TransactionContextInterface, ID string) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// UpdateApartmentAddress updates the address of an apartment
+func (h *ApartmentHandler) UpdateApartmentAddress(ctx contractapi.TransactionContextInterface, apartmentID, newAddress string) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.Rented = true
-	fmt.Printf("Rented with %v", apartment.RentalPrice)
-	return h.RepoContract.PutApartment(ctx, apartment)
-
+	apt.Address = newAddress
+	return h.RepoContract.PutApartment(ctx, apt)
 }
 
-// UnRent
-func (h *ApartmentHandler) UnRentApartment(ctx contractapi.TransactionContextInterface, ID string) error {
-	// check if the apartment exists
-	apartment, err := h.GetApartment(ctx, ID)
+// RentApartment rents out an apartment to a client
+func (h *ApartmentHandler) RentApartment(ctx contractapi.TransactionContextInterface, apartmentID, clientName, contactDetails string, leaseStartDate, leaseEndDate time.Time) error {
+	if leaseEndDate.Before(leaseStartDate) {
+		return fmt.Errorf("lease end date must be after the lease start date")
+	}
+
+	apt, err := h.GetApartment(ctx, apartmentID)
 	if err != nil {
 		return err
 	}
-	apartment.Rented = false
-	//fmt.Printf("Rental price is %v", apartment.RentalPrice)
-	return h.RepoContract.PutApartment(ctx, apartment)
+	if apt.IsRented {
+		return fmt.Errorf("apartment is already rented")
+	}
 
+	// Generate a new UUID for clientID
+	clientID := uuid.New().String()
+
+	client := &apartment.Client{
+		ClientID:       clientID,
+		FullName:       clientName,
+		ContactDetails: contactDetails,
+		LeaseStartDate: leaseStartDate,
+		LeaseEndDate:   leaseEndDate,
+	}
+
+	apt.IsRented = true
+	apt.CurrentTenant = client
+
+	return h.RepoContract.PutApartment(ctx, apt)
+}
+
+// UnrentApartment marks an apartment as unrented
+func (h *ApartmentHandler) UnrentApartment(ctx contractapi.TransactionContextInterface, apartmentID string) error {
+	apt, err := h.GetApartment(ctx, apartmentID)
+	if err != nil {
+		return err
+	}
+	if !apt.IsRented {
+		return fmt.Errorf("apartment is not currently rented")
+	}
+
+	apt.IsRented = false
+	apt.CurrentTenant = nil
+
+	return h.RepoContract.PutApartment(ctx, apt)
 }

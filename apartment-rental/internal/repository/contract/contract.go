@@ -61,5 +61,5 @@ func (r *RepoContract) PutApartment(ctx contractapi.TransactionContextInterface,
 	if err != nil {
 		return err
 	}
-	return ctx.GetStub().PutState(apartment.ID, apartmentJSON)
+	return ctx.GetStub().PutState(apartment.ApartmentID, apartmentJSON)
 }

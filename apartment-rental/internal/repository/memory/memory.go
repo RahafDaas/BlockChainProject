@@ -38,6 +38,6 @@ func (rm *RepoMemory) GetAllApartments(_ contractapi.TransactionContextInterface
 
 // used to add new apartment and to update
 func (rm *RepoMemory) PutApartment(_ contractapi.TransactionContextInterface, apartment *apartment.Apartment) error {
-	(*rm)[apartment.ID] = apartment
+	(*rm)[apartment.ApartmentID] = apartment
 	return nil
 }
