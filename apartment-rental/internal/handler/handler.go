@@ -3,40 +3,52 @@ package handler
 import (
 	"apartment-rental/internal/model/apartment"
 	"apartment-rental/internal/repository/contract"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 type ApartmentHandler struct {
-	//RepoContract memory.RepoMemory
 	contract.RepoContract
 }
 
-// GetApartment retrieves a specific apartment by ID
 func (h *ApartmentHandler) GetApartment(ctx contractapi.TransactionContextInterface, apartmentID string) (*apartment.Apartment, error) {
 	return h.RepoContract.GetApartment(ctx, apartmentID)
 }
 
-// GetAllApartments retrieves all apartments
 func (h *ApartmentHandler) GetAllApartments(ctx contractapi.TransactionContextInterface) ([]*apartment.Apartment, error) {
 	return h.RepoContract.GetAllApartments(ctx)
 }
 
 // RegisterApartment registers a new apartment
-func (h *ApartmentHandler) RegisterApartment(ctx contractapi.TransactionContextInterface, title string, roomsCount, squareFootage, restroomsCount, floorLevel, constructionYear int, address string, hasWiFi, hasKitchen, hasLivingRoom bool, monthlyRent float64) error {
-	// Generate a new UUID for apartmentID
-	apartmentID := uuid.New().String()
+func (h *ApartmentHandler) RegisterApartment(ctx contractapi.TransactionContextInterface, title string, roomsCount, squareFootage, restroomsCount, floorLevel, constructionYear int, address string, hasWiFi, hasKitchen, hasLivingRoom bool, monthlyRent float64) (string, error) {
+	apartmentID := generateDeterministicID(title, address, roomsCount, squareFootage, floorLevel)
 
-	// Create a new apartment instance
+	existingApt, _ := h.RepoContract.GetApartment(ctx, apartmentID)
+	if existingApt != nil {
+		return "", fmt.Errorf("apartment with ID %s already exists", apartmentID)
+	}
+
 	apt, err := apartment.New(apartmentID, title, address, roomsCount, squareFootage, restroomsCount, floorLevel, constructionYear, hasKitchen, hasLivingRoom, hasWiFi, monthlyRent)
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Print(apartmentID)
-	return h.RepoContract.PutApartment(ctx, apt)
+
+	err = h.RepoContract.PutApartment(ctx, apt)
+	if err != nil {
+		return "", err
+	}
+
+	return apartmentID, nil
+}
+
+func generateDeterministicID(title, address string, roomsCount, squareFootage, floorLevel int) string {
+	data := fmt.Sprintf("%s|%s|%d|%d|%d", title, address, roomsCount, squareFootage, floorLevel)
+	hash := sha256.Sum256([]byte(data))
+	return hex.EncodeToString(hash[:])
 }
 
 // UpdateApartmentTitle updates the title of an apartment
@@ -158,16 +170,16 @@ func (h *ApartmentHandler) RentApartment(ctx contractapi.TransactionContextInter
 		return fmt.Errorf("lease end date must be after the lease start date")
 	}
 
-	apt, err := h.GetApartment(ctx, apartmentID)
+	apt, err := h.RepoContract.GetApartment(ctx, apartmentID)
 	if err != nil {
-		return err
-	}
-	if apt.IsRented {
-		return fmt.Errorf("apartment is already rented")
+		return fmt.Errorf("failed to get apartment: %v", err)
 	}
 
-	// Generate a new UUID for clientID
-	clientID := uuid.New().String()
+	if apt.IsRented {
+		return fmt.Errorf("apartment with ID %s is already rented", apartmentID)
+	}
+
+	clientID := generateDeterministicClientID(apartmentID, clientName, leaseStartDate)
 
 	client := &apartment.Client{
 		ClientID:       clientID,
@@ -180,21 +192,36 @@ func (h *ApartmentHandler) RentApartment(ctx contractapi.TransactionContextInter
 	apt.IsRented = true
 	apt.CurrentTenant = client
 
-	return h.RepoContract.PutApartment(ctx, apt)
+	if err := h.RepoContract.PutApartment(ctx, apt); err != nil {
+		return fmt.Errorf("failed to update apartment rental status: %v", err)
+	}
+
+	return nil
 }
 
-// UnrentApartment marks an apartment as unrented
-func (h *ApartmentHandler) UnrentApartment(ctx contractapi.TransactionContextInterface, apartmentID string) error {
-	apt, err := h.GetApartment(ctx, apartmentID)
+func generateDeterministicClientID(apartmentID, clientName string, leaseStartDate time.Time) string {
+	data := fmt.Sprintf("%s|%s|%s", apartmentID, clientName, leaseStartDate.Format(time.RFC3339))
+	hash := sha256.Sum256([]byte(data))
+	return hex.EncodeToString(hash[:])
+}
+
+// ReturnApartment returns an apartment to the available list
+func (h *ApartmentHandler) ReturnApartment(ctx contractapi.TransactionContextInterface, apartmentID string) error {
+	apt, err := h.RepoContract.GetApartment(ctx, apartmentID)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get apartment: %v", err)
 	}
+
 	if !apt.IsRented {
-		return fmt.Errorf("apartment is not currently rented")
+		return fmt.Errorf("apartment with ID %s is not currently rented", apartmentID)
 	}
 
 	apt.IsRented = false
 	apt.CurrentTenant = nil
 
-	return h.RepoContract.PutApartment(ctx, apt)
+	if err := h.RepoContract.PutApartment(ctx, apt); err != nil {
+		return fmt.Errorf("failed to update apartment rental status: %v", err)
+	}
+
+	return nil
 }

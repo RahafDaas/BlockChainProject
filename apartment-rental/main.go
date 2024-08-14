@@ -25,9 +25,11 @@ func mainChaincode() {
 func main() {
 
 	mainChaincode()
+
 	/*handler := handler.ApartmentHandler{
-		RepoContract: *memory.New(),
+		RepoContract: memory.New(), // Pass the pointer directly
 	}
+
 	var ctx contractapi.TransactionContextInterface
 
 	// Register a new apartment
