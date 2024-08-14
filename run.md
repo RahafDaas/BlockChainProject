@@ -1,4 +1,4 @@
-// Screenshots of code execution using the Network.
+# Screenshots of code execution using the Fabric Samples.
 
 This method was created in the contract.go file then invoked in the handler.go file, that returns all available apartments to be rented with all the details about it.
 ![GetAllApartments](<WhatsApp Image 2024-08-14 at 13.32.16_f6219a50 - Copy.jpg>)
