@@ -21,7 +21,7 @@ We started by assuming that the structure of an apartment consists of:
 - WiFi bool
 - Rented bool
 
-The motivation behind this system is to have one place that links all apartments into one office to make renting apartments much easier and more flexible. Most of the required information regarding renting an apartment is available in this system. Initially, an apartment is not rented therefore, the Rented field will always be False unless the RentApartment method from the Handler is called and assuming that the user has paid the rent price. If the rent contract expires by calling the UnRentApartment method, the Rented field will switch to False.
+The motivation behind this system is to have one place that links all apartments into one office to make renting apartments much easier and more flexible. Most of the required information regarding renting an apartment is available in this system. Initially, an apartment is not rented therefore, the Rented field will always be False unless the RentApartment method from the Handler is called and assuming that the user has paid the rent price. represent data related to clients and apartments, likely in a rental management system. If the rent contract expires by calling the UnRentApartment method, the Rented field will switch to False.
 
 The functions of this system are:
 
@@ -39,6 +39,9 @@ The functions of this system are:
 - Register an apartment.
 - To Rent an apartment.
 - And to unrent an apartment.
+- Includes unique ClientID and FullName.
+- Tracks TotalPayments.
+- Contains LeaseStartDate and LeaseEndDate.
 
 ### This project was done by Rahaf Daas, Arwa Bawazir, and Raghad Alhuzaimi and was submitted to the Security Engineering Lab at Prince Sultan University for the summer BootCamp that took place from 21st/July/2024 to 14th/August/2024.
 
