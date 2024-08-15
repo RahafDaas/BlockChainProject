@@ -46,8 +46,7 @@ The functions of this system are:
 ### This project was done by Rahaf Daas, Arwa Bawazir, and Raghad Alhuzaimi and was submitted to the Security Engineering Lab at Prince Sultan University for the summer BootCamp that took place from 21st/July/2024 to 14th/August/2024.
 
 Contributor's Github and Linked In accounts:
-
-- [Rahaf Daas] (https://github.com/RahafDaas) (https://www.linkedin.com/in/rahafdaas/)
-- [Arwa Abdullah] (https://github.com/ArwaBawa) (https://www.linkedin.com/in/arwa-bawazir-5113b2276/)
-- [Raghad Alhuzaimi] (https://github.com/Raghad887) (https://www.linkedin.com/in/raghad-alhuzaimi-968887294/)
-- [Blockchian Camp] (https://github.com/TheMarzoog/blockchain-camp24)
+- **Rahaf Daas:** [GitHub](https://github.com/RahafDaas) - [LinkedIn](https://www.linkedin.com/in/rahafdaas/)
+- **Arwa Abdullah:** [GitHub](https://github.com/ArwaBawa) - [LinkedIn](https://www.linkedin.com/in/arwa-bawazir-5113b2276/)
+- **Raghad Alhuzaimi:** [GitHub](https://github.com/Raghad887) [LinkedIn](https://www.linkedin.com/in/raghad-alhuzaimi-968887294/)
+- [**Blockchian Camp Repo**](https://github.com/TheMarzoog/blockchain-camp24)
